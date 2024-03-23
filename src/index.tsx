@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ReactDOM from 'react-dom/client';
 import './index.scss';
 import "./styles/theme.scss";
@@ -15,11 +16,19 @@ const router = createBrowserRouter([
     },
 ]);
 
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+    },
+});
+
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 root.render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <ThemeProvider theme={darkTheme}>
+            <RouterProvider router={router} />
+        </ThemeProvider>
     </React.StrictMode>
 );

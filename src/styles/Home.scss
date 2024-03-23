@@ -36,4 +36,10 @@
             flex: 1;
         }
     }
+
+    .home__connect-block {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
 }
