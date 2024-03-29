@@ -8,11 +8,16 @@ import {
     RouterProvider,
   } from "react-router-dom";
 import Home from './pages/home';
+import Code from './pages/code';
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <Home />,
+    },
+    {
+        path: "/code/:hash",
+        element: <Code />,
     },
 ]);
 

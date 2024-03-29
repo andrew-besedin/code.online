@@ -3,6 +3,7 @@ import Logo from "../../components/UI/Logo/Logo";
 import Button from "../../components/UI/Button/Button";
 import { useState } from "react";
 import { TextField } from "@mui/material";
+import { Link } from "react-router-dom";
 
 export default function Home() {
 
@@ -21,9 +22,11 @@ export default function Home() {
                                 Gone are the days of traditional, nerve-wracking code interviews conducted in person or over clunky video conferencing tools. Enter Code.online, the cutting-edge web application that is transforming the landscape of live code interviews. <br /> Say goodbye to the stress and hassle of traditional interviews and embrace the future of tech recruitment with <span>{"// Code.online!"}</span>
                             </p>
                             <div className="home__content-buttons">
-                                <Button>
-                                    Create Room
-                                </Button>
+                                <Link to="/code/test">
+                                    <Button>
+                                        Create Room
+                                    </Button>
+                                </Link>
                                 <Button onClick={() => setEnterCode(true)}>
                                     Connect Room
                                 </Button>
@@ -35,7 +38,9 @@ export default function Home() {
                                     variant="standard"
                                     label="Room Code"
                                 />
-                                <Button>Connect</Button>
+                                <Link to="/code/test">
+                                    <Button>Connect</Button>
+                                </Link>
                                 <Button onClick={() => setEnterCode(false)}>Back</Button>
                             </div>
                         </>

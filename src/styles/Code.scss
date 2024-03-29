@@ -1,0 +1,24 @@
+.header {
+    padding: 30px;
+}
+
+.body__wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+
+    .code__editor {
+        height: 100%;
+        transition: none;
+    
+        * {
+            font-family: inherit;
+            transition: none;
+        }
+    }
+}
+
