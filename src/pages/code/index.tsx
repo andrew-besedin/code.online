@@ -2,6 +2,7 @@ import "../../styles/Code.scss";
 import { useParams } from "react-router-dom";
 import Logo from "../../components/UI/Logo/Logo";
 import { Editor, Monaco } from "@monaco-editor/react";
+import { useEffect } from "react";
 
 export default function Code() {
 
@@ -26,8 +27,6 @@ export default function Code() {
         }
         
     }
-
-  
     
     const { hash } = useParams();
 

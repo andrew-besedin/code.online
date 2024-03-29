@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
+    "@monaco-editor/react": "^4.6.0",
     "@mui/material": "^5.15.14",
     "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@testing-library/jest-dom": "^5.17.0",
@@ -14,6 +15,7 @@
     "@types/node": "^16.18.91",
     "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
+    "express": "^4.19.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
