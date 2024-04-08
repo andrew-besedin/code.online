@@ -1,9 +1,9 @@
 import { Router } from "express";
 import controller from "../controllers/controller";
-import middleware from "../middleware/middleware";
+import tryCatch from "../utils/tryCatch";
 
 const router = Router();
 
-router.get("/test", middleware.verifyUserData, controller.test);
+router.get("/register",  tryCatch(controller.register));
 
 export default router;

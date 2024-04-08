@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
+import User from "../models/User";
 
 class Controller {
 
-    test(req: Request, res: Response) {
-        res.send({ success: true });
+    async register(req: Request, res: Response) {
+        const newUser = await User.create({});
+        console.log(newUser.dataValues);
+        res.send({ success: true });        
     }
 }
 
