@@ -20,7 +20,9 @@ User.init(
     }
 );
 
-User.hasMany(Room);
+User.hasMany(Room, {
+    foreignKey: "owner_id",
+});
 Room.belongsTo(User, {
     foreignKey: "owner_id",
 });

@@ -3,7 +3,6 @@ import sequelize from "../sequelize";
 
 class Room extends Model {
     declare id: number;
-    declare owner_id: number;
 }
 
 Room.init(
@@ -13,9 +12,6 @@ Room.init(
             primaryKey: true,
             autoIncrement: true
         },
-        owner_id: {
-            type: DataTypes.BIGINT,
-        }
     },
     {
         sequelize,
