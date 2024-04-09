@@ -1,28 +1,26 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../sequelize";
-import Room from "./Room";
 
-class User extends Model {
+class Room extends Model {
     declare id: number;
+    declare owner_id: number;
 }
 
-User.init(
+Room.init(
     {
         id: {
             type: DataTypes.BIGINT,
             primaryKey: true,
             autoIncrement: true
         },
+        owner_id: {
+            type: DataTypes.BIGINT,
+        }
     },
     {
         sequelize,
-        modelName: "users",
+        modelName: "rooms",
     }
 );
 
-User.hasMany(Room);
-Room.belongsTo(User, {
-    foreignKey: "owner_id",
-});
-
-export default User;
+export default Room;

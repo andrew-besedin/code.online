@@ -3,7 +3,6 @@ import router from "./routers/route";
 import cookieParser from "cookie-parser";
 import User from "./models/User";
 import sequelize from "./sequelize";
-import tryCatch from "./utils/tryCatch";
 
 const PORT = 3033;
     
