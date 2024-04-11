@@ -7,5 +7,6 @@ const router = Router();
 
 router.get("/register", tryCatch(controller.register));
 router.get("/create-room", middleware.verifyUserData, tryCatch(controller.createRoom));
+router.post("/get-room", middleware.verifyUserData, tryCatch(controller.getRoom));
 
 export default router;
