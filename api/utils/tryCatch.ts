@@ -5,7 +5,8 @@ function tryCatch(fn: (req: Request, res: Response) => Promise<any>) {
         try {
             await fn(req, res);
         } catch(err) {
-            console.log(err);
+            console.log("Internal error:");
+            console.error(err);
             res.status(500).send({ success: false, error: "Internal error" });
         }
     }

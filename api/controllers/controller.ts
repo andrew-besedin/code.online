@@ -8,6 +8,7 @@ import langs from "../constants/langs.json";
 import SetLangBody from "../interfaces/bodies/SetLangBody";
 import { ROOM_PREFIX } from "../utils/constants";
 import { io } from "../server";
+import makeid from "../utils/makeid";
 
 if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not provided in .env file");
@@ -28,25 +29,26 @@ class Controller {
 
     async createRoom(req: Request, res: Response) {
         const userData = req.body.userData as UserData;
-        const newRoom = await Room.create({ owner_id: userData.id });
-        res.send({ success: true, data: { id: newRoom.dataValues.id } });
+        const hash = makeid(16);
+        await Room.create({ owner_id: userData.id, hash });
+        res.send({ success: true, data: { hash } });
     }
 
     async getRoom(req: Request, res: Response) {
         const body = req.body as GetRoomBody;
 
-        const room = await Room.findOne({ where: { id: body.roomId } });
+        const roomRow = await Room.findOne({ where: { hash: body.hash } });
 
-        if (!room) {
+        if (!roomRow) {
             return res.status(200).send({ success: false, error: "Room not found" });
         }
 
         return res.send({ 
             success: true, 
             data: { 
-                id: room.dataValues.id, 
-                text: room.dataValues.text,
-                lang: room.dataValues.lang
+                id: roomRow.dataValues.id, 
+                text: roomRow.dataValues.text,
+                lang: roomRow.dataValues.lang
             } 
         });
     }
@@ -58,17 +60,17 @@ class Controller {
     async setLang(req: Request, res: Response) {
         const body = req.body as SetLangBody;
 
-        const room = await Room.findOne({ where: { id: body.roomId } });
+        const roomRow = await Room.findOne({ where: { hash: body.hash } });
 
-        if (!room) {
+        if (!roomRow) {
             return res.status(200).send({ success: false, error: "Room not found" });
         }
 
         const lang = (langs as { [key: string]: string })[body.lang] ? body.lang : null;
 
-        await room.update({ lang: lang });
+        await roomRow.update({ lang: lang });
 
-        io.to(ROOM_PREFIX + body.roomId).emit("lang-changed", { lang });
+        io.to(ROOM_PREFIX + roomRow.id).emit("lang-changed", { lang });
 
         return res.send({ success: true });
     }

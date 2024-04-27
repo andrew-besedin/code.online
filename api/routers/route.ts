@@ -8,7 +8,7 @@ const router = Router();
 router.get("/register", tryCatch(controller.register));
 router.get("/create-room", middleware.verifyUserData, tryCatch(controller.createRoom));
 router.post("/get-room", middleware.verifyUserData, tryCatch(controller.getRoom));
-router.get("/get-langs", tryCatch(controller.getLangs));
-router.post("/set-lang", tryCatch(controller.setLang));
+router.get("/get-langs", middleware.verifyUserData, tryCatch(controller.getLangs));
+router.post("/set-lang", middleware.verifyUserData, tryCatch(controller.setLang));
 
 export default router;

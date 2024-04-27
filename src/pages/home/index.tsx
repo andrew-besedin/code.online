@@ -30,7 +30,7 @@ export default function Home() {
             .then(res => {
                 if (res.success && res.data) {
                     setCreatingRoom(false);
-                    navigate("/code/" + res.data.id);
+                    navigate("/code/" + res.data.hash);
                 } else {
                     throw new Error("Unauthorized");
                 }

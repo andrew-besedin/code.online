@@ -6,58 +6,45 @@ import Room from "../models/Room";
 
 class SocketController {
     async joinRoom(data: SocketRoomBody, socket: Socket) {
-        try {
-            const { roomId } = data;
-            if (!roomId || typeof roomId !== "string") {
-                return;
-            }
-            const roomRow = await Room.findOne({ where: { id: roomId } });
-            if (!roomRow) {
-                return;
-            }
-    
-    
-            
-            socket.join(ROOM_PREFIX + roomId);
-    
-            // roomsConnections[socket.id] = {
-            //     roomId,
-            //     userId: roomRow.dataValues.userId
-            // }
-    
-        } catch(err) {
-            console.log("WebSocket error:", err);
+        const { hash } = data;
+        if (!hash || typeof hash !== "string") {
+            return;
         }
-       
+        const roomRow = await Room.findOne({ where: { hash } });
+        if (!roomRow) {
+            return;
+        }
+
+        socket.join(ROOM_PREFIX + roomRow.id);
     }
 
     async leaveRoom(data: SocketRoomBody, socket: Socket) {
-        const { roomId } = data;
-        if (!roomId || typeof roomId !== "string") {
+        const { hash } = data;
+        if (!hash || typeof hash !== "string") {
             return;
         }
-        const roomRow = await Room.findOne({ where: { id: roomId } });
+        const roomRow = await Room.findOne({ where: { hash } });
         if (!roomRow) {
             return;
         }
-        socket.leave(ROOM_PREFIX + roomId);
+        socket.leave(ROOM_PREFIX + roomRow.id);
     }
 
     async changeText(data: SocketChangeTextBody, socket: Socket) {
-        const { roomId, text } = data;
+        const { hash, text } = data;
 
-        if (!roomId || typeof roomId !== "string") {
+        if (!hash || typeof hash !== "string") {
             return;
         }
 
-        const roomRow = await Room.findOne({ where: { id: roomId } });
+        const roomRow = await Room.findOne({ where: { hash } });
         if (!roomRow) {
             return;
         }
 
-        await Room.update({ text }, { where: { id: roomId } });
+        await Room.update({ text }, { where: { id: roomRow.id } });
 
-        socket.broadcast.to(ROOM_PREFIX + roomId).emit("text-changed", { text });
+        socket.broadcast.to(ROOM_PREFIX + roomRow.id).emit("text-changed", { text });
     }
 }
 

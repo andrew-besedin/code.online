@@ -15,17 +15,15 @@ export default class FetchUtils {
         return await fetch(`${FetchUtils.BASE_URL}/create-room`).then(res => res.json());
     }
 
-    static async getRoom(id: string): Promise<ServerResponse<GetRoomResponse>> {
-        return await axios.post('/api/get-room', {
-            roomId: id,
-        }).then(res => res.data);
+    static async getRoom(hash: string): Promise<ServerResponse<GetRoomResponse>> {
+        return await axios.post('/api/get-room', { hash }).then(res => res.data);
     }
 
-    static async getLang(): Promise<ServerResponse<GetLangResponse>> {
+    static async getLangs(): Promise<ServerResponse<GetLangResponse>> {
         return await fetch(`${FetchUtils.BASE_URL}/get-langs`).then(res => res.json());
     }
 
-    static async setLang(roomId: string, lang: string): Promise<ServerResponse<undefined>> {
-        return await axios.post('/api/set-lang', { roomId, lang }).then(res => res.data);
+    static async setLang(hash: string, lang: string): Promise<ServerResponse<undefined>> {
+        return await axios.post('/api/set-lang', { hash, lang }).then(res => res.data);
     }
 }

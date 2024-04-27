@@ -1,4 +1,4 @@
 export default interface SocketChangeTextBody {
-    roomId: string;
+    hash: string;
     text: string;
 }

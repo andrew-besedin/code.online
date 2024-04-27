@@ -7,13 +7,15 @@ import socket from "../../utils/socket";
 import FetchUtils from "../../utils/FetchUtils";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 
+const defaultLang = "javascript";
+
 export default function Code() {
     const navigate = useNavigate();
 
     const { hash } = useParams();
 
     const [text, setText] = useState("");
-    const [lang, setLang] = useState("javascript");
+    const [lang, setLang] = useState(defaultLang);
     const [langs, setLangs] = useState<{ [key: string]: string }>({ "javascript": " JavaScript" });
 
     useEffect(() => {
@@ -22,7 +24,7 @@ export default function Code() {
             .then(res => {
                 if (res.success && res.data) {
                     setText(res.data.text);
-                    setLang(res.data.lang);
+                    setLang(res.data.lang || defaultLang);
                 } else {
                     throw new Error("No room");
                 }
@@ -34,16 +36,16 @@ export default function Code() {
     }, [hash, navigate]);
 
     useEffect(() => {
-        socket.emit("join-room", { roomId: hash });
+        socket.emit("join-room", { hash });
 
         return () => {
-            socket.emit("leave-room", { roomId: hash });
+            socket.emit("leave-room", { hash });
         }
     }, [hash]);
 
     useEffect(() => {
         function langChangedHandler({ lang }: { lang: string }) {
-            setLang(lang);
+            setLang(lang || defaultLang);
         }
 
         socket.on("lang-changed", langChangedHandler);
@@ -67,7 +69,7 @@ export default function Code() {
 
     useEffect(() => {
         (async () => {
-            const result = await FetchUtils.getLang();
+            const result = await FetchUtils.getLangs();
             if (!result.success) return;
             setLangs(result.data?.langs || {});
         })();
@@ -95,7 +97,7 @@ export default function Code() {
     }
 
     function editorChange(value: string | undefined) {
-        socket.emit("change-text", { roomId: hash, text: value });
+        socket.emit("change-text", { hash, text: value });
         setText(value || "");
     }
     
