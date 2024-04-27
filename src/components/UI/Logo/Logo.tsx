@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { ReactComponent as LogoIcon } from "../../../assets/images/logo.svg";
 
 interface LogoProps {
@@ -6,8 +7,8 @@ interface LogoProps {
 
 export default function Logo({ className }: LogoProps) {
     return (
-        <a className={className} href="/">
+        <Link to="/" style={{ display: "flex" }} className={className}>
             <LogoIcon />
-        </a>   
+        </Link>   
     )
 }

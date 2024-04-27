@@ -3,19 +3,33 @@ import { Socket } from "socket.io";
 import { ROOM_PREFIX } from "../utils/constants";
 import SocketChangeTextBody from "../interfaces/bodies/SocketChangeTextBody";
 import Room from "../models/Room";
-import { io } from "../server";
+import SocketChangeLangBody from "../interfaces/bodies/SocketChangeLangBody";
 
 class SocketController {
     async joinRoom(data: SocketRoomBody, socket: Socket) {
-        const { roomId } = data;
-        if (!roomId || typeof roomId !== "string") {
-            return;
+        try {
+            const { roomId } = data;
+            if (!roomId || typeof roomId !== "string") {
+                return;
+            }
+            const roomRow = await Room.findOne({ where: { id: roomId } });
+            if (!roomRow) {
+                return;
+            }
+    
+    
+            
+            socket.join(ROOM_PREFIX + roomId);
+    
+            // roomsConnections[socket.id] = {
+            //     roomId,
+            //     userId: roomRow.dataValues.userId
+            // }
+    
+        } catch(err) {
+            console.log("WebSocket error:", err);
         }
-        const roomRow = await Room.findOne({ where: { id: roomId } });
-        if (!roomRow) {
-            return;
-        }
-        socket.join(ROOM_PREFIX + roomId);
+       
     }
 
     async leaveRoom(data: SocketRoomBody, socket: Socket) {
@@ -28,6 +42,19 @@ class SocketController {
             return;
         }
         socket.leave(ROOM_PREFIX + roomId);
+    }
+
+    async changeLang(data: SocketChangeLangBody, socket: Socket) {
+        const  { roomId, lang } = data;
+
+        if (!roomId || typeof roomId !== "string") {
+            return;
+        }
+
+        const roomRow = await Room.findOne({ where: { id: roomId } });
+        if (!roomRow) {
+            return;
+        }
     }
 
     async changeText(data: SocketChangeTextBody, socket: Socket) {
@@ -44,7 +71,7 @@ class SocketController {
 
         await Room.update({ text }, { where: { id: roomId } });
 
-        io.to(ROOM_PREFIX + roomId).emit("text-changed", { text });
+        socket.broadcast.to(ROOM_PREFIX + roomId).emit("text-changed", { text });
     }
 }
 

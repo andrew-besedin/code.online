@@ -3,7 +3,7 @@ import Logo from "../../components/UI/Logo/Logo";
 import Button from "../../components/UI/Button/Button";
 import { useState } from "react";
 import { TextField } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import FetchUtils from "../../utils/FetchUtils";
 
 export default function Home() {
@@ -12,6 +12,10 @@ export default function Home() {
     const [enterCode, setEnterCode] = useState(false);
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [creatingError, setCreatingError] = useState("");
+    const [connectingRoom, setConnectingRoom] = useState(false);
+    const [connectingError, setConnectingError] = useState("");
+
+    const [code, setCode] = useState("");
 
     function createRoomClick() {
         setCreatingRoom(true);
@@ -34,6 +38,29 @@ export default function Home() {
             .catch(() => {
                 setCreatingRoom(false);
                 setCreatingError("Error while creating room");
+            })
+    }
+
+    function connectRoomClick() {
+        setConnectingRoom(true);
+
+        if (false) {
+            setConnectingRoom(false);
+            navigate("/code/" + code);
+        }
+
+        FetchUtils.register()
+            .then(res => {
+                if (res.success) {
+                    setConnectingRoom(false);
+                    navigate("/code/" + code);
+                } else {
+                    throw new Error("Unauthorized");
+                }
+            })
+            .catch(() => {
+                setConnectingRoom(false);
+                setConnectingError("Error while connecting the room");
             })
     }
 
@@ -64,12 +91,15 @@ export default function Home() {
                                 <TextField 
                                     variant="standard"
                                     label="Room Code"
+                                    value={code}
+                                    onChange={e => setCode(e.currentTarget.value)}
                                 />
-                                <Link to="/code/test">
-                                    <Button>Connect</Button>
-                                </Link>
+                                <Button onClick={connectRoomClick}>
+                                    {connectingRoom ? "Loading..." : "Connect"}
+                                </Button>
                                 <Button onClick={() => setEnterCode(false)}>Back</Button>
                             </div>
+                            <p>{connectingError}</p>
                         </>
                     }
                    

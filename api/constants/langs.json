@@ -1,0 +1,16 @@
+{
+    "typescript": "TypeScript",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "java": "Java",
+    "c++": "C++",
+    "c": "C",
+    "html": "HTML",
+    "css": "CSS",
+    "php": "PHP",
+    "ruby": "Ruby",
+    "go": "Go",
+    "swift": "Swift",
+    "kotlin": "Kotlin",
+    "rust": "Rust"
+}

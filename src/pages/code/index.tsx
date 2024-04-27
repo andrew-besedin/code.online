@@ -5,6 +5,7 @@ import { Editor, Monaco } from "@monaco-editor/react";
 import { useEffect, useState } from "react";
 import socket from "../../utils/socket";
 import FetchUtils from "../../utils/FetchUtils";
+import { MenuItem, Select } from "@mui/material";
 
 export default function Code() {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function Code() {
     const { hash } = useParams();
 
     const [text, setText] = useState("");
+    const [lang, setLang] = useState("javascript");
 
     useEffect(() => {
         if (!hash) return;
@@ -80,6 +82,18 @@ export default function Code() {
         return (
             <header className="header">
                 <Logo />
+                <Select
+                    placeholder="Language"
+                    variant="standard"
+                    value={lang}
+                    onChange={event => setLang(event.target.value)}
+                    sx={{ width: 150 }}
+                >
+                    <MenuItem value={"typescript"}>TypeScript</MenuItem>
+                    <MenuItem value={"javascript"}>JavaScript</MenuItem>
+                    <MenuItem value={"html"}>HTML</MenuItem>
+                    <MenuItem value={"cpp"}>C++</MenuItem>
+                </Select>
             </header>
         )
     }
@@ -91,7 +105,7 @@ export default function Code() {
                 <Editor 
                     className="code__editor" 
                     theme="vs-dark"
-                    language="typescript"
+                    language={lang}
                     onMount={handleEditorMount}
                     value={text}
                     onChange={editorChange}
