@@ -3,7 +3,6 @@ import { Socket } from "socket.io";
 import { ROOM_PREFIX } from "../utils/constants";
 import SocketChangeTextBody from "../interfaces/bodies/SocketChangeTextBody";
 import Room from "../models/Room";
-import SocketChangeLangBody from "../interfaces/bodies/SocketChangeLangBody";
 
 class SocketController {
     async joinRoom(data: SocketRoomBody, socket: Socket) {
@@ -42,19 +41,6 @@ class SocketController {
             return;
         }
         socket.leave(ROOM_PREFIX + roomId);
-    }
-
-    async changeLang(data: SocketChangeLangBody, socket: Socket) {
-        const  { roomId, lang } = data;
-
-        if (!roomId || typeof roomId !== "string") {
-            return;
-        }
-
-        const roomRow = await Room.findOne({ where: { id: roomId } });
-        if (!roomRow) {
-            return;
-        }
     }
 
     async changeText(data: SocketChangeTextBody, socket: Socket) {

@@ -5,7 +5,7 @@ import { Editor, Monaco } from "@monaco-editor/react";
 import { useEffect, useState } from "react";
 import socket from "../../utils/socket";
 import FetchUtils from "../../utils/FetchUtils";
-import { MenuItem, Select } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 
 export default function Code() {
     const navigate = useNavigate();
@@ -14,6 +14,7 @@ export default function Code() {
 
     const [text, setText] = useState("");
     const [lang, setLang] = useState("javascript");
+    const [langs, setLangs] = useState<{ [key: string]: string }>({ "javascript": " JavaScript" });
 
     useEffect(() => {
         if (!hash) return;
@@ -21,6 +22,7 @@ export default function Code() {
             .then(res => {
                 if (res.success && res.data) {
                     setText(res.data.text);
+                    setLang(res.data.lang);
                 } else {
                     throw new Error("No room");
                 }
@@ -40,6 +42,18 @@ export default function Code() {
     }, [hash]);
 
     useEffect(() => {
+        function langChangedHandler({ lang }: { lang: string }) {
+            setLang(lang);
+        }
+
+        socket.on("lang-changed", langChangedHandler);
+
+        return () => {
+            socket.off("lang-changed", langChangedHandler);
+        }
+    }, []);
+
+    useEffect(() => {
         function textChangedHandler({ text }: { text: string }) {
             setText(text);
         }
@@ -49,6 +63,14 @@ export default function Code() {
         return () => {
             socket.off("text-changed", textChangedHandler);
         }
+    }, []);
+
+    useEffect(() => {
+        (async () => {
+            const result = await FetchUtils.getLang();
+            if (!result.success) return;
+            setLangs(result.data?.langs || {});
+        })();
     }, []);
 
     function handleEditorMount(editor: any, monaco: Monaco) {
@@ -77,6 +99,14 @@ export default function Code() {
         setText(value || "");
     }
     
+    function langChange(event: SelectChangeEvent) {
+        const newLang = event.target.value;
+        setLang(newLang);
+        (async () => {
+            if (!hash) return;
+            await FetchUtils.setLang(hash, newLang);
+        })();
+    }
 
     function Header() {
         return (
@@ -86,13 +116,14 @@ export default function Code() {
                     placeholder="Language"
                     variant="standard"
                     value={lang}
-                    onChange={event => setLang(event.target.value)}
+                    onChange={langChange}
                     sx={{ width: 150 }}
                 >
-                    <MenuItem value={"typescript"}>TypeScript</MenuItem>
-                    <MenuItem value={"javascript"}>JavaScript</MenuItem>
-                    <MenuItem value={"html"}>HTML</MenuItem>
-                    <MenuItem value={"cpp"}>C++</MenuItem>
+                    {
+                        Object.keys(langs).map(e => (
+                            <MenuItem key={e} value={e}>{langs[e]}</MenuItem>
+                        ))   
+                    }
                 </Select>
             </header>
         )

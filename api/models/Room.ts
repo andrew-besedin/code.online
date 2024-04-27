@@ -5,6 +5,7 @@ class Room extends Model {
     declare id: number;
     declare owner_id: string;
     declare text: string;
+    declare lang: string;
 }
 
 Room.init(
@@ -16,6 +17,9 @@ Room.init(
         },
         text: {
             type: DataTypes.TEXT,
+        },
+        lang: {
+            type: DataTypes.STRING,
         }
     },
     {

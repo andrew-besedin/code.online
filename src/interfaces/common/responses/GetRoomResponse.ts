@@ -1,4 +1,5 @@
 export default interface GetRoomResponse {
     id: string,
-    text: string
+    text: string,
+    lang: string
 }

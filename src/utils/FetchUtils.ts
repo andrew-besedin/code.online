@@ -1,5 +1,6 @@
 import ServerResponse from "../interfaces/common/ServerResponse";
 import CreateRoomResponse from "../interfaces/common/responses/CreateRoomResponse";
+import GetLangResponse from "../interfaces/common/responses/GetLangResponse";
 import GetRoomResponse from "../interfaces/common/responses/GetRoomResponse";
 import axios from "axios";
 
@@ -18,5 +19,13 @@ export default class FetchUtils {
         return await axios.post('/api/get-room', {
             roomId: id,
         }).then(res => res.data);
+    }
+
+    static async getLang(): Promise<ServerResponse<GetLangResponse>> {
+        return await fetch(`${FetchUtils.BASE_URL}/get-langs`).then(res => res.json());
+    }
+
+    static async setLang(roomId: string, lang: string): Promise<ServerResponse<undefined>> {
+        return await axios.post('/api/set-lang', { roomId, lang }).then(res => res.data);
     }
 }
