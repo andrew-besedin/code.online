@@ -9,16 +9,22 @@ import {
   } from "react-router-dom";
 import Home from './pages/home';
 import Code from './pages/code';
+import NotFound from './pages/404/404';
 
 const router = createBrowserRouter([
     {
-        path: "/",
-        element: <Home />,
-    },
-    {
-        path: "/code/:hash",
-        element: <Code />,
-    },
+        errorElement: <NotFound />,
+        children: [
+            {
+                path: "/",
+                element: <Home />,
+            },
+            {
+                path: "/code/:hash",
+                element: <Code />,
+            },
+        ]
+    }
 ]);
 
 const darkTheme = createTheme({
