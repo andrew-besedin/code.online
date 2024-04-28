@@ -21,6 +21,12 @@ class Controller {
             throw new Error("JWT_SECRET is not provided in .env file");
         }        
 
+        const oldToken = req.cookies.token;
+
+        if (oldToken) {
+            return res.send({ success: true });  
+        }
+
         const newUser = await User.create({});
         const token = jwt.sign({ id: newUser.dataValues.id }, process.env.JWT_SECRET);
         res.cookie("token", token);
@@ -65,6 +71,10 @@ class Controller {
 
         if (!roomRow) {
             return res.status(200).send({ success: false, error: "Room not found" });
+        }
+
+        if (roomRow.owner_id !== body.userData.id) {
+            return res.status(401).send({ success: false, error: "Unauthorized" });
         }
 
         const lang = (langs as { [key: string]: string })[body.lang] ? body.lang : null;

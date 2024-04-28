@@ -1,10 +1,11 @@
 import "../../styles/Home.scss";
 import Logo from "../../components/UI/Logo/Logo";
 import Button from "../../components/UI/Button/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import FetchUtils from "../../utils/FetchUtils";
+import getCookie from "../../utils/getCookie";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -17,16 +18,17 @@ export default function Home() {
 
     const [code, setCode] = useState("");
 
+    useEffect(() => {
+        const token = getCookie("token");
+        console.log(token);
+        if (token) return;
+        FetchUtils.register();
+    }, []);
+
     function createRoomClick() {
         setCreatingRoom(true);
-        FetchUtils.register()
-            .then(res => {
-                if (res.success) {
-                    return FetchUtils.createRoom();
-                } else {
-                    throw new Error("Unauthorized");
-                }
-            })
+        
+        FetchUtils.createRoom()
             .then(res => {
                 if (res.success && res.data) {
                     setCreatingRoom(false);

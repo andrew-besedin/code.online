@@ -5,8 +5,9 @@ import { Editor, Monaco } from "@monaco-editor/react";
 import { useEffect, useRef, useState } from "react";
 import socket from "../../utils/socket";
 import FetchUtils from "../../utils/FetchUtils";
-import { Button, MenuItem, Select, SelectChangeEvent, TextField, Typography, useTheme, useThemeProps } from "@mui/material";
+import { Button, MenuItem, Select, SelectChangeEvent, TextField, Typography, useTheme } from "@mui/material";
 import { Unstable_Popup as BasePopup } from '@mui/base/Unstable_Popup';
+import getCookie from "../../utils/getCookie";
 
 const defaultLang = "javascript";
 
@@ -23,36 +24,49 @@ export default function Code() {
     const [langs, setLangs] = useState<{ [key: string]: string }>({ "javascript": " JavaScript" });
     const [isAdmin, setIsAdmin] = useState(false);
     const [invitePopupOpened, setInvitePopupOpened] = useState(false);
+    const [registered, setRegistered] = useState(false);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setInvitePopupOpened(prev => !prev);
     };
 
     useEffect(() => {
-        if (!hash) return;
-        FetchUtils.getRoom(hash)
-            .then(res => {
-                if (res.success && res.data) {
-                    setText(res.data.text);
-                    setLang(res.data.lang || defaultLang);
-                    setIsAdmin(!!res.data.isAdmin);
-                } else {
-                    throw new Error("No room");
-                }
-            })
-            .catch(err => {
-                console.log(err);
+
+        async function fetchLangs() {
+            const result = await FetchUtils.getLangs();
+            if (!result.success) return;
+            setLangs(result.data?.langs || {});
+        }
+
+        async function fetchRoom() {
+            if (!hash) return;
+            await FetchUtils.register();
+            setRegistered(true);
+            await fetchLangs();
+            const result = await FetchUtils.getRoom(hash);
+
+            if (result.success && result.data) {
+                setText(result.data.text);
+                setLang(result.data.lang || defaultLang);
+                setIsAdmin(!!result.data.isAdmin);
+            } else {
                 navigate("/");
-            });
+                throw new Error("No room");
+            }
+        }
+        
+        fetchRoom();
     }, [hash, navigate]);
 
     useEffect(() => {
-        socket.emit("join-room", { hash });
+        const token = getCookie("token");
+        if (!token) return;
+        socket.emit("join-room", { hash, token });
 
         return () => {
-            socket.emit("leave-room", { hash });
+            socket.emit("leave-room", { hash, token });
         }
-    }, [hash]);
+    }, [hash, registered]);
 
     useEffect(() => {
         function langChangedHandler({ lang }: { lang: string }) {
@@ -78,13 +92,6 @@ export default function Code() {
         }
     }, []);
 
-    useEffect(() => {
-        (async () => {
-            const result = await FetchUtils.getLangs();
-            if (!result.success) return;
-            setLangs(result.data?.langs || {});
-        })();
-    }, []);
 
     function handleEditorMount(editor: any, monaco: Monaco) {
         if (monaco) {
@@ -147,6 +154,7 @@ export default function Code() {
                         value={lang}
                         onChange={langChange}
                         sx={{ width: 150 }}
+                        disabled={!isAdmin}
                     >
                         {
                             Object.keys(langs).map(e => (
@@ -157,7 +165,7 @@ export default function Code() {
                     <Button variant="outlined" ref={inviteBtnRef} type="button" onClick={handleClick}>
                         <Typography>Invite</Typography>
                     </Button>
-                    <BasePopup open={invitePopupOpened} anchor={inviteBtnRef.current}>
+                    <BasePopup style={{ transition: "none" }} open={invitePopupOpened} anchor={inviteBtnRef.current}>
                         <InvitePopup />
                     </BasePopup>
                 </div>

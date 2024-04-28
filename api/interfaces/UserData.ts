@@ -1,3 +1,3 @@
 export default interface UserData {
-    id: number;
+    id: string;
 }
