@@ -1,7 +1,26 @@
 .header {
     padding: 30px;
     display: flex;
-    gap: 50px;
+    justify-content: space-between;
+    align-items: center;
+
+    > p {
+        color: rgb(133, 194, 255);
+    }
+   
+    .header__panel {
+        display: flex;
+        gap: 50px;
+
+    }
+}
+
+.header__invite-popup {
+    margin-top: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .body__wrapper {

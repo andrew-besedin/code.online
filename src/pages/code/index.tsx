@@ -2,21 +2,31 @@ import "../../styles/Code.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import Logo from "../../components/UI/Logo/Logo";
 import { Editor, Monaco } from "@monaco-editor/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import socket from "../../utils/socket";
 import FetchUtils from "../../utils/FetchUtils";
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { Button, MenuItem, Select, SelectChangeEvent, TextField, Typography, useTheme, useThemeProps } from "@mui/material";
+import { Unstable_Popup as BasePopup } from '@mui/base/Unstable_Popup';
 
 const defaultLang = "javascript";
 
 export default function Code() {
     const navigate = useNavigate();
+    const theme = useTheme();
+
+    const inviteBtnRef = useRef<HTMLButtonElement>(null);
 
     const { hash } = useParams();
 
     const [text, setText] = useState("");
     const [lang, setLang] = useState(defaultLang);
     const [langs, setLangs] = useState<{ [key: string]: string }>({ "javascript": " JavaScript" });
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [invitePopupOpened, setInvitePopupOpened] = useState(false);
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setInvitePopupOpened(prev => !prev);
+    };
 
     useEffect(() => {
         if (!hash) return;
@@ -25,6 +35,7 @@ export default function Code() {
                 if (res.success && res.data) {
                     setText(res.data.text);
                     setLang(res.data.lang || defaultLang);
+                    setIsAdmin(!!res.data.isAdmin);
                 } else {
                     throw new Error("No room");
                 }
@@ -110,30 +121,54 @@ export default function Code() {
         })();
     }
 
+    function InvitePopup() {
+        return (
+            <div style={{ backgroundColor: theme.palette.background.default }} className="header__invite-popup">
+                <TextField 
+                    label="Code"
+                    value={hash} 
+                />
+                <TextField 
+                    label="Link"
+                    value={window.location.href} 
+                />
+            </div>
+        )
+    }
+
     function Header() {
         return (
             <header className="header">
-                <Logo />
-                <Select
-                    placeholder="Language"
-                    variant="standard"
-                    value={lang}
-                    onChange={langChange}
-                    sx={{ width: 150 }}
-                >
-                    {
-                        Object.keys(langs).map(e => (
-                            <MenuItem key={e} value={e}>{langs[e]}</MenuItem>
-                        ))   
-                    }
-                </Select>
+                <div className="header__panel">
+                    <Logo />
+                    <Select
+                        placeholder="Language"
+                        variant="standard"
+                        value={lang}
+                        onChange={langChange}
+                        sx={{ width: 150 }}
+                    >
+                        {
+                            Object.keys(langs).map(e => (
+                                <MenuItem key={e} value={e}>{langs[e]}</MenuItem>
+                            ))   
+                        }
+                    </Select>
+                    <Button variant="outlined" ref={inviteBtnRef} type="button" onClick={handleClick}>
+                        <Typography>Invite</Typography>
+                    </Button>
+                    <BasePopup open={invitePopupOpened} anchor={inviteBtnRef.current}>
+                        <InvitePopup />
+                    </BasePopup>
+                </div>
+                <Typography>{isAdmin ? "Participant" : "Admin"} is online</Typography>
             </header>
         )
     }
 
     return (
         <div className="body__wrapper">
-            <Header />
+            {Header()}
             <main className="main">
                 <Editor 
                     className="code__editor" 

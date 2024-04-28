@@ -25,6 +25,9 @@ const darkTheme = createTheme({
     palette: {
         mode: 'dark',
     },
+    typography: {
+        fontFamily: "Inter",
+    }
 });
 
 const root = ReactDOM.createRoot(

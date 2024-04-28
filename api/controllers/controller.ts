@@ -48,7 +48,8 @@ class Controller {
             data: { 
                 id: roomRow.dataValues.id, 
                 text: roomRow.dataValues.text,
-                lang: roomRow.dataValues.lang
+                lang: roomRow.dataValues.lang,
+                isAdmin: roomRow.dataValues.owner_id === body.userData.id
             } 
         });
     }
