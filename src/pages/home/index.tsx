@@ -43,27 +43,17 @@ export default function Home() {
             })
     }
 
-    function connectRoomClick() {
+    async function connectRoomClick() {
         setConnectingRoom(true);
 
-        if (false) {
+        const result = await FetchUtils.getRoom(code);
+        if (!result.success) {
+            setConnectingRoom(false);
+            setConnectingError("Room not found");
+        } else {
             setConnectingRoom(false);
             navigate("/code/" + code);
         }
-
-        FetchUtils.register()
-            .then(res => {
-                if (res.success) {
-                    setConnectingRoom(false);
-                    navigate("/code/" + code);
-                } else {
-                    throw new Error("Unauthorized");
-                }
-            })
-            .catch(() => {
-                setConnectingRoom(false);
-                setConnectingError("Error while connecting the room");
-            })
     }
 
     return (
