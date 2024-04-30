@@ -58,7 +58,7 @@ export default function Home() {
 
     return (
         <>
-            <main className="main">
+            <main className="home__main">
                 <div className="home__content">
                     <Logo 
                         className="home__logo"
