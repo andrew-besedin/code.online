@@ -1,6 +1,7 @@
 import ServerResponse from "../interfaces/common/ServerResponse";
 import CreateRoomResponse from "../interfaces/common/responses/CreateRoomResponse";
 import GetLangResponse from "../interfaces/common/responses/GetLangResponse";
+import GetOpponentOnline from "../interfaces/common/responses/GetOpponentOnline";
 import GetRoomResponse from "../interfaces/common/responses/GetRoomResponse";
 import axios from "axios";
 
@@ -25,5 +26,9 @@ export default class FetchUtils {
 
     static async setLang(hash: string, lang: string): Promise<ServerResponse<undefined>> {
         return await axios.post('/api/set-lang', { hash, lang }).then(res => res.data);
+    }
+
+    static async getOpponentOnline(hash: string): Promise<ServerResponse<GetOpponentOnline>> {
+        return await axios.post('/api/get-opponent-online', { hash }).then(res => res.data);
     }
 }

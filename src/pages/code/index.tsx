@@ -25,6 +25,7 @@ export default function Code() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [invitePopupOpened, setInvitePopupOpened] = useState(false);
     const [registered, setRegistered] = useState(false);
+    const [opponentOnline, setOpponentOnline] = useState(false);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setInvitePopupOpened(prev => !prev);
@@ -62,11 +63,21 @@ export default function Code() {
         const token = getCookie("token");
         if (!token) return;
         socket.emit("join-room", { hash, token });
+    }, [hash, registered]);
 
-        return () => {
+    useEffect(() => {
+        const token = getCookie("token");
+        if (!token) return;
+        function onUnload() {
             socket.emit("leave-room", { hash, token });
         }
-    }, [hash, registered]);
+
+        window.addEventListener("beforeunload", onUnload);
+
+        return () => {
+            onUnload();
+        }
+    }, [hash]);
 
     useEffect(() => {
         function langChangedHandler({ lang }: { lang: string }) {
@@ -79,6 +90,22 @@ export default function Code() {
             socket.off("lang-changed", langChangedHandler);
         }
     }, []);
+
+    useEffect(() => {
+        async function fetchOpponentOnline() {
+            if (!hash) return;
+            const result = await FetchUtils.getOpponentOnline(hash);
+            if (result.success && result.data) {
+                console.log(result);
+                setOpponentOnline(!!result.data.online);
+            }
+        }
+
+        fetchOpponentOnline();
+        const id = setInterval(fetchOpponentOnline, 1000);
+
+        return () => clearInterval(id);
+    }, [hash]);
 
     useEffect(() => {
         function textChangedHandler({ text }: { text: string }) {
@@ -169,7 +196,9 @@ export default function Code() {
                         <InvitePopup />
                     </BasePopup>
                 </div>
-                <Typography>{isAdmin ? "Participant" : "Admin"} is online</Typography>
+                {opponentOnline && 
+                    <Typography>{isAdmin ? "Participant" : "Admin"} is online</Typography>
+                }
             </header>
         )
     }

@@ -3,10 +3,11 @@ import { Socket } from "socket.io";
 import { ROOM_PREFIX } from "../utils/constants";
 import SocketChangeTextBody from "../interfaces/bodies/SocketChangeTextBody";
 import Room from "../models/Room";
+import { roomsConnections } from "../shared/rooms-connections";
 
 class SocketController {
     async joinRoom(data: SocketRoomBody, socket: Socket) {
-        const { hash } = data;
+        const { hash, userData } = data;
         if (!hash || typeof hash !== "string") {
             return;
         }
@@ -16,10 +17,20 @@ class SocketController {
         }
 
         socket.join(ROOM_PREFIX + roomRow.id);
+
+        if (!roomsConnections[roomRow.id]) {
+            roomsConnections[roomRow.id] = {};
+        }
+
+        if (!roomsConnections[roomRow.id][userData.id]) {
+            roomsConnections[roomRow.id][userData.id] = new Set();
+        }
+
+        roomsConnections[roomRow.id][userData.id].add(socket.id);
     }
 
     async leaveRoom(data: SocketRoomBody, socket: Socket) {
-        const { hash } = data;
+        const { hash, userData } = data;
         if (!hash || typeof hash !== "string") {
             return;
         }
@@ -27,7 +38,9 @@ class SocketController {
         if (!roomRow) {
             return;
         }
+        
         socket.leave(ROOM_PREFIX + roomRow.id);
+        roomsConnections[roomRow.id]?.[userData.id]?.delete?.(socket.id);
     }
 
     async changeText(data: SocketChangeTextBody, socket: Socket) {

@@ -9,6 +9,7 @@ import SetLangBody from "../interfaces/bodies/SetLangBody";
 import { ROOM_PREFIX } from "../utils/constants";
 import { io } from "../server";
 import makeid from "../utils/makeid";
+import { roomsConnections } from "../shared/rooms-connections";
 
 if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not provided in .env file");
@@ -84,6 +85,53 @@ class Controller {
         io.to(ROOM_PREFIX + roomRow.id).emit("lang-changed", { lang });
 
         return res.send({ success: true });
+    }
+
+    async isOpponentOnline(req: Request, res: Response) {
+        const body = req.body as GetRoomBody;
+
+        const roomRow = await Room.findOne({ where: { hash: body.hash } });
+
+        if (!roomRow) {
+            return res.status(200).send({ success: false, error: "Room not found" });
+        }
+
+        let opponentOnline = false;
+
+        const currRoomConnections = roomsConnections[roomRow.id];
+
+        if (currRoomConnections) {
+            if (roomRow.owner_id !== body.userData.id) {
+               
+                const adminSockets = currRoomConnections[roomRow.owner_id];
+                
+                if (adminSockets) {
+                    for (const socketId of adminSockets || []) {
+                        if (!io.sockets.adapter.rooms.get(socketId)?.has(socketId)) {
+                            adminSockets.delete(socketId);
+                        } else {
+                            opponentOnline = true;
+                        }
+                    }
+                }
+            } else {
+                for (const nonAdminId of Object.keys(currRoomConnections).filter(e => e !== roomRow.owner_id)) {
+                    const nonAdminSockets = currRoomConnections[nonAdminId];
+
+                    if (nonAdminSockets) {
+                        for (const socketId of nonAdminSockets || []) {
+                            if (!io.sockets.adapter.rooms.get(socketId)?.has(socketId)) {
+                                nonAdminSockets.delete(socketId);
+                            } else {
+                                opponentOnline = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return res.status(200).send({ success: true, data: { online: opponentOnline } });
     }
 }
 

@@ -2,9 +2,8 @@
 
 interface RoomsConnections {
     [key: string]: {
-        roomId: string;
-        userId: string;
+        [key: string]: Set<string>;
     }
 }
 
-export const roomsConnections: RoomsConnections[] = [];
+export const roomsConnections: RoomsConnections = {};

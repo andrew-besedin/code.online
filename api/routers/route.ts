@@ -10,5 +10,6 @@ router.get("/create-room", middleware.verifyUserData, tryCatch(controller.create
 router.post("/get-room", middleware.verifyUserData, tryCatch(controller.getRoom));
 router.get("/get-langs", middleware.verifyUserData, tryCatch(controller.getLangs));
 router.post("/set-lang", middleware.verifyUserData, tryCatch(controller.setLang));
+router.post("/get-opponent-online", middleware.verifyUserData, tryCatch(controller.isOpponentOnline));
 
 export default router;
