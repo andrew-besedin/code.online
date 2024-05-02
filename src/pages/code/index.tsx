@@ -119,6 +119,14 @@ export default function Code() {
         }
     }, []);
 
+    useEffect(() => {
+        setInterval(() => {
+            if (socket.disconnected) {
+                socket.connect();
+            }
+        }, 1000);
+    }, []);
+
 
     function handleEditorMount(editor: any, monaco: Monaco) {
         if (monaco) {
