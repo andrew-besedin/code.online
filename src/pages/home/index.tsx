@@ -20,7 +20,6 @@ export default function Home() {
 
     useEffect(() => {
         const token = getCookie("token");
-        console.log(token);
         if (token) return;
         FetchUtils.register();
     }, []);

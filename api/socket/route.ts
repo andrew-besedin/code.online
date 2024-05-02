@@ -4,9 +4,6 @@ import socketMiddlewareRouting from "../middleware/socketMiddlewareRouting";
 import verifyUserData from "../jwt/verifyUserData";
 
 export default function applySocketRoute(socket: Socket) {
-
-    console.log("SOCKET CONNECTED!!!");
-
     async function tryCatch(fn: Function) {
         try {
             await fn();
@@ -43,7 +40,6 @@ export default function applySocketRoute(socket: Socket) {
     socket.on("change-text", (data) => tryCatch(() => socketController.changeText(data, socket)));
     
     socket.on("disconnect", () => {
-        console.log("SOCKET " + socket.id + " DISCONNECTED!!!!");
         socket.rooms.forEach(e => {
             socket.leave(e);
         });

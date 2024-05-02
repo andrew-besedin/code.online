@@ -96,7 +96,6 @@ export default function Code() {
             if (!hash) return;
             const result = await FetchUtils.getOpponentOnline(hash);
             if (result.success && result.data) {
-                console.log(result);
                 setOpponentOnline(!!result.data.online);
             }
         }
