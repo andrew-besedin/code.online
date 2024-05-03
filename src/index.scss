@@ -25,6 +25,10 @@ html, body {
 	transition: none;
 }
 
+html {
+    min-width: 800px;
+}
+
 @font-face {
     font-family: 'Inter';
     src: url(./assets/fonts/Inter/Inter-Regular.ttf) format("opentype");
