@@ -12,10 +12,15 @@
         display: flex;
         gap: 50px;
 
+        .header__actions {
+            display: flex;
+            gap: 10px;
+        }
     }
 }
 
-.header__invite-popup {
+.header__invite-popup, .header__users-popup {
+    min-width: 200px;
     margin-top: 8px;
     padding: 20px;
     display: flex;

@@ -96,42 +96,41 @@ class Controller {
             return res.status(200).send({ success: false, error: "Room not found" });
         }
 
-        let opponentOnline = false;
+        const usersList: ("admin" | "participant")[] = [];
 
         const currRoomConnections = roomsConnections[roomRow.id];
 
         if (currRoomConnections) {
-            if (roomRow.owner_id !== body.userData.id) {
-               
-                const adminSockets = currRoomConnections[roomRow.owner_id];
-                
-                if (adminSockets) {
-                    for (const socketId of adminSockets || []) {
-                        if (!io.sockets.adapter.rooms.get(socketId)?.has(socketId)) {
-                            adminSockets.delete(socketId);
-                        } else {
-                            opponentOnline = true;
-                        }
+            const adminSockets = currRoomConnections[roomRow.owner_id];
+
+            if (adminSockets) {
+                for (const socketId of adminSockets || []) {
+                    if (!io.sockets.adapter.rooms.get(socketId)?.has(socketId)) {
+                        adminSockets.delete(socketId);
+                    } else {
+                        usersList.push("admin");
+                        break;
                     }
                 }
-            } else {
-                for (const nonAdminId of Object.keys(currRoomConnections).filter(e => e !== roomRow.owner_id)) {
-                    const nonAdminSockets = currRoomConnections[nonAdminId];
+            }
 
-                    if (nonAdminSockets) {
-                        for (const socketId of nonAdminSockets || []) {
-                            if (!io.sockets.adapter.rooms.get(socketId)?.has(socketId)) {
-                                nonAdminSockets.delete(socketId);
-                            } else {
-                                opponentOnline = true;
-                            }
+            for (const nonAdminId of Object.keys(currRoomConnections).filter(e => e !== roomRow.owner_id)) {
+                const nonAdminSockets = currRoomConnections[nonAdminId];
+
+                if (nonAdminSockets) {
+                    for (const socketId of nonAdminSockets || []) {
+                        if (!io.sockets.adapter.rooms.get(socketId)?.has(socketId)) {
+                            nonAdminSockets.delete(socketId);
+                        } else {
+                            usersList.push("participant");
+                            break;
                         }
                     }
                 }
             }
         }
 
-        return res.status(200).send({ success: true, data: { online: opponentOnline } });
+        return res.status(200).send({ success: true, data: { participants: usersList } });
     }
 }
 

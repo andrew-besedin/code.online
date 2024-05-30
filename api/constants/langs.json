@@ -12,5 +12,6 @@
     "go": "Go",
     "swift": "Swift",
     "kotlin": "Kotlin",
-    "rust": "Rust"
+    "rust": "Rust",
+    "csharp": "C#"
 }

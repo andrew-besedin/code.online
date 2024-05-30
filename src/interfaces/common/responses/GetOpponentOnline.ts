@@ -1,3 +1,3 @@
 export default interface GetOpponentOnline {
-    online: boolean
+    participants: ("admin" | "participant")[];
 }

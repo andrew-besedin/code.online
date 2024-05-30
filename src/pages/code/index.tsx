@@ -16,6 +16,7 @@ export default function Code() {
     const theme = useTheme();
 
     const inviteBtnRef = useRef<HTMLButtonElement>(null);
+    const usersBtnRef = useRef<HTMLButtonElement>(null);
 
     const { hash } = useParams();
 
@@ -24,8 +25,10 @@ export default function Code() {
     const [langs, setLangs] = useState<{ [key: string]: string }>({ "javascript": " JavaScript" });
     const [isAdmin, setIsAdmin] = useState(false);
     const [invitePopupOpened, setInvitePopupOpened] = useState(false);
+    const [usersPopupOpened, setUsersPopupOpened] = useState(false);
     const [registered, setRegistered] = useState(false);
-    const [opponentOnline, setOpponentOnline] = useState(false);
+    // const [opponentOnline, setOpponentOnline] = useState(false);
+    const [participants, setParticipants] = useState<string[]>([]);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setInvitePopupOpened(prev => !prev);
@@ -96,7 +99,14 @@ export default function Code() {
             if (!hash) return;
             const result = await FetchUtils.getOpponentOnline(hash);
             if (result.success && result.data) {
-                setOpponentOnline(!!result.data.online);
+                let counter = 1;
+                setParticipants(result.data.participants.map(e => {
+                    if (e === "admin") {
+                        return "Admin";
+                    } else {
+                        return `Participant ${counter++}`
+                    }
+                }));
             }
         }
 
@@ -177,6 +187,18 @@ export default function Code() {
         )
     }
 
+    function UsersPopup() {
+        return (
+            <div style={{ backgroundColor: theme.palette.background.default }} className="header__users-popup">
+                {
+                    participants.map(e => (
+                        <Typography key={e} variant="body1">{e}</Typography>
+                    ))
+                }
+            </div>
+        )
+    }
+
     function Header() {
         return (
             <header className="header">
@@ -196,16 +218,34 @@ export default function Code() {
                             ))   
                         }
                     </Select>
-                    <Button variant="outlined" ref={inviteBtnRef} type="button" onClick={handleClick}>
-                        <Typography>Invite</Typography>
-                    </Button>
-                    <BasePopup style={{ transition: "none" }} open={invitePopupOpened} anchor={inviteBtnRef.current}>
-                        <InvitePopup />
-                    </BasePopup>
+                    <div className="header__actions">
+                        <Button variant="outlined" ref={inviteBtnRef} type="button" onClick={handleClick}>
+                            <Typography>Invite</Typography>
+                        </Button>
+                        <BasePopup style={{ transition: "none" }} open={invitePopupOpened} anchor={inviteBtnRef.current}>
+                            <InvitePopup />
+                        </BasePopup>
+                        {lang === "javascript" &&
+                            <Button
+                                variant="outlined"
+                                type="button"
+                                // eslint-disable-next-line no-eval
+                                onClick={() => eval(text)}
+                            >
+                                <Typography>Run JS</Typography>
+                            </Button>
+                        }
+                    </div>
                 </div>
-                {opponentOnline && 
-                    <Typography>{isAdmin ? "Participant" : "Admin"} is online</Typography>
-                }
+                <Button
+                    ref={usersBtnRef}
+                    onClick={() => setUsersPopupOpened(prev => !prev)}
+                >
+                    Users online
+                </Button>
+                <BasePopup style={{ transition: "none" }} open={usersPopupOpened} anchor={usersBtnRef.current}>
+                    <UsersPopup />
+                </BasePopup>
             </header>
         )
     }
