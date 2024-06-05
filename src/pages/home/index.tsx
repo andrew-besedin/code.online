@@ -24,22 +24,23 @@ export default function Home() {
         FetchUtils.register();
     }, []);
 
-    function createRoomClick() {
+    async function createRoomClick() {
         setCreatingRoom(true);
         
-        FetchUtils.createRoom()
-            .then(res => {
-                if (res.success && res.data) {
-                    setCreatingRoom(false);
-                    navigate("/code/" + res.data.hash);
-                } else {
-                    throw new Error("Unauthorized");
-                }
-            })
-            .catch(() => {
+        try {
+            const result = await FetchUtils.createRoom()
+
+            if (result.success && result.data) {
                 setCreatingRoom(false);
-                setCreatingError("Error while creating room");
-            })
+                navigate("/code/" + result.data.hash);
+            } else {
+                throw new Error("Unauthorized");
+            }
+              
+        } catch {
+            setCreatingRoom(false);
+            setCreatingError("Error while creating room");
+        }
     }
 
     async function connectRoomClick() {

@@ -8,6 +8,8 @@ import FetchUtils from "../../utils/FetchUtils";
 import { Button, MenuItem, Select, SelectChangeEvent, TextField, Typography, useTheme } from "@mui/material";
 import { Unstable_Popup as BasePopup } from '@mui/base/Unstable_Popup';
 import getCookie from "../../utils/getCookie";
+import { ReactComponent as UserIcon } from "../../assets/images/user.svg";
+import { useQuery } from "@tanstack/react-query";
 
 const defaultLang = "javascript";
 
@@ -19,6 +21,14 @@ export default function Code() {
     const usersBtnRef = useRef<HTMLButtonElement>(null);
 
     const { hash } = useParams();
+
+    const { isPending, error, data: getRoomResult } = useQuery({
+        queryKey: ["room"],
+        queryFn: async () => {
+            if (!hash) return;
+            return await FetchUtils.getRoom(hash);
+        }
+    });
 
     const [text, setText] = useState("");
     const [lang, setLang] = useState(defaultLang);
@@ -42,25 +52,27 @@ export default function Code() {
             setLangs(result.data?.langs || {});
         }
 
-        async function fetchRoom() {
-            if (!hash) return;
-            await FetchUtils.register();
-            setRegistered(true);
-            await fetchLangs();
-            const result = await FetchUtils.getRoom(hash);
+        fetchLangs();
+    }, [hash, navigate]);
 
+    useEffect(() => {
+
+    }, []);
+
+    useEffect(() => {
+        const result = getRoomResult;
+        if (!isPending && result) {
             if (result.success && result.data) {
-                setText(result.data.text);
-                setLang(result.data.lang || defaultLang);
-                setIsAdmin(!!result.data.isAdmin);
+                const { text, lang, isAdmin } = result.data;
+                setText(text);
+                setLang(lang || defaultLang);
+                setIsAdmin(!!isAdmin);
             } else {
                 navigate("/");
                 throw new Error("No room");
             }
         }
-        
-        fetchRoom();
-    }, [hash, navigate]);
+    }, [isPending, error, getRoomResult, navigate]);
 
     useEffect(() => {
         const token = getCookie("token");
@@ -192,7 +204,10 @@ export default function Code() {
             <div style={{ backgroundColor: theme.palette.background.default }} className="header__users-popup">
                 {
                     participants.map(e => (
-                        <Typography key={e} variant="body1">{e}</Typography>
+                        <div key={e} className="header__users-popup__user">
+                            <UserIcon />
+                            <Typography variant="body1">{e}</Typography>
+                        </div>
                     ))
                 }
             </div>

@@ -10,6 +10,7 @@ import {
 import Home from './pages/home';
 import Code from './pages/code';
 import NotFound from './pages/404/404';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const router = createBrowserRouter([
     {
@@ -39,10 +40,15 @@ const darkTheme = createTheme({
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
+
+const queryClient = new QueryClient();
+
 root.render(
     <React.StrictMode>
-        <ThemeProvider theme={darkTheme}>
-            <RouterProvider router={router} />
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+            <ThemeProvider theme={darkTheme}>
+                <RouterProvider router={router} />
+            </ThemeProvider>
+        </QueryClientProvider>
     </React.StrictMode>
 );

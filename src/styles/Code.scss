@@ -28,6 +28,18 @@
     gap: 10px;
 }
 
+.header__users-popup {
+    margin-right: 20px;
+
+    &__user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        > svg {}
+    }
+}
+
 .body__wrapper {
     height: 100vh;
     display: flex;
