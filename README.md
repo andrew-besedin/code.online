@@ -9,4 +9,6 @@ Stack:
 - SCSS
 - TanStack Query
 - express
+- PostgresQL
+- Sequelize
 - socket.io
