@@ -28,7 +28,7 @@ export default function Home() {
         setCreatingRoom(true);
         
         try {
-            const result = await FetchUtils.createRoom()
+            const result = await FetchUtils.createRoom();
 
             if (result.success && result.data) {
                 setCreatingRoom(false);
@@ -98,5 +98,5 @@ export default function Home() {
                 </div>
             </main>
         </>
-    )
+    );
 }

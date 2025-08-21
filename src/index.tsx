@@ -5,8 +5,8 @@ import './index.scss';
 import "./styles/theme.scss";
 import {
     createBrowserRouter,
-    RouterProvider,
-  } from "react-router-dom";
+    RouterProvider
+} from "react-router-dom";
 import Home from './pages/home';
 import Code from './pages/code';
 import NotFound from './pages/404/404';
@@ -18,22 +18,22 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <Home />,
+                element: <Home />
             },
             {
                 path: "/code/:hash",
-                element: <Code />,
-            },
+                element: <Code />
+            }
         ]
     }
 ]);
 
 const darkTheme = createTheme({
     palette: {
-        mode: 'dark',
+        mode: 'dark'
     },
     typography: {
-        fontFamily: "Inter",
+        fontFamily: "Inter"
     }
 });
 

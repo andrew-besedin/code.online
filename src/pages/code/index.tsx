@@ -31,7 +31,7 @@ function InvitePopup({
                 value={window.location.href} 
             />
         </div>
-    )
+    );
 }
 
 function UsersPopup({
@@ -61,7 +61,7 @@ function UsersPopup({
                 )
             }
         </div>
-    )
+    );
 }
 
 
@@ -148,7 +148,7 @@ function Header({
 
         return () => {
             onUnload();
-        }
+        };
     }, [hash]);
 
     useEffect(() => {
@@ -160,7 +160,7 @@ function Header({
 
         return () => {
             socket.off("lang-changed", langChangedHandler);
-        }
+        };
     }, []);
 
     useEffect(() => {
@@ -173,7 +173,7 @@ function Header({
                     if (e === "admin") {
                         return "Admin";
                     } else {
-                        return `Participant ${counter++}`
+                        return `Participant ${counter++}`;
                     }
                 }));
             }
@@ -194,7 +194,7 @@ function Header({
 
         return () => {
             socket.off("text-changed", textChangedHandler);
-        }
+        };
     }, []);
 
     useEffect(() => {
@@ -295,7 +295,7 @@ function Header({
                 />
             </Popover>
         </header>
-    )
+    );
 }
 
 export default function Code() {
@@ -350,5 +350,5 @@ export default function Code() {
                 />
             </main>
         </div>
-    )
+    );
 }

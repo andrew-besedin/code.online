@@ -18,5 +18,5 @@ export default function Button(props: ButtonProps) {
         >
             {props.children}
         </MUIButton>
-    )
+    );
 }

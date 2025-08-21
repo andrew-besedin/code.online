@@ -10,5 +10,5 @@ export default function Logo({ className }: LogoProps) {
         <Link to="/" style={{ display: "flex" }} className={className}>
             <LogoIcon />
         </Link>   
-    )
+    );
 }
