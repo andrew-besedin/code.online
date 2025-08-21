@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import socket from "../../utils/socket";
 import FetchUtils from "../../utils/FetchUtils";
 import { Button, MenuItem, Select, SelectChangeEvent, TextField, Typography, useTheme } from "@mui/material";
-import { Unstable_Popup as BasePopup } from '@mui/base/Unstable_Popup';
+import Popover from '@mui/material/Popover';
 import getCookie from "../../utils/getCookie";
 import { ReactComponent as UserIcon } from "../../assets/images/user.svg";
 import { useQuery } from "@tanstack/react-query";
@@ -44,12 +44,21 @@ function UsersPopup({
     return (
         <div style={{ backgroundColor: theme.palette.background.default }} className="header__users-popup">
             {
-                participants.map(e => (
-                    <div key={e} className="header__users-popup__user">
-                        <UserIcon />
-                        <Typography variant="body1">{e}</Typography>
-                    </div>
-                ))
+                participants.length ? (
+                    participants.map(e => (
+                        <div key={e} className="header__users-popup__user">
+                            <UserIcon />
+                            <Typography variant="body1">{e}</Typography>
+                        </div>
+                    ))
+                ) : (
+                    <Typography
+                        className="header__users-popup__no-users"
+                        variant="body1"
+                    >
+                        Loading...
+                    </Typography>
+                )
             }
         </div>
     )
@@ -227,11 +236,24 @@ function Header({
                     <Button variant="outlined" ref={inviteBtnRef} type="button" onClick={handleClick}>
                         <Typography>Invite</Typography>
                     </Button>
-                    <BasePopup style={{ transition: "none" }} open={invitePopupOpened} anchor={inviteBtnRef.current}>
+                    <Popover
+                        sx={{ transition: "none", marginTop: 1 }}
+                        open={invitePopupOpened}
+                        anchorEl={inviteBtnRef.current}
+                        onClose={() => setInvitePopupOpened(false)}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center'
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center'
+                        }} 
+                    >
                         <InvitePopup
                             hash={hash}
                         />
-                    </BasePopup>
+                    </Popover>
                     {lang === "javascript" &&
                         <Button
                             variant="outlined"
@@ -250,11 +272,28 @@ function Header({
             >
                 Users online
             </Button>
-            <BasePopup style={{ transition: "none" }} open={usersPopupOpened} anchor={usersBtnRef.current}>
+            <Popover
+                sx={{
+                    transition: "none",
+                    zIndex: 5,
+                    marginTop: 1
+                }}
+                open={usersPopupOpened}
+                anchorEl={usersBtnRef.current}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center'
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
+                onClose={() => setUsersPopupOpened(false)}
+            >
                 <UsersPopup
                     participants={participants}
                 />
-            </BasePopup>
+            </Popover>
         </header>
     )
 }

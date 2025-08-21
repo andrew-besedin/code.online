@@ -20,24 +20,25 @@
 }
 
 .header__invite-popup, .header__users-popup {
+    position: relative;
     min-width: 200px;
-    margin-top: 8px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    z-index: 2;
 }
 
 .header__users-popup {
-    margin-right: 20px;
-
     &__user {
         display: flex;
         align-items: center;
         gap: 10px;
-
-        > svg {}
     }
+}
+
+.header__users-popup__no-users {
+    color: var(--font-transparent);
 }
 
 .body__wrapper {
