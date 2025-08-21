@@ -13,14 +13,66 @@ import { useQuery } from "@tanstack/react-query";
 
 const defaultLang = "javascript";
 
-export default function Code() {
-    const navigate = useNavigate();
+function InvitePopup({
+    hash
+}: {
+    hash: string | undefined;
+}) {
     const theme = useTheme();
 
+    return (
+        <div style={{ backgroundColor: theme.palette.background.default }} className="header__invite-popup">
+            <TextField 
+                label="Code"
+                value={hash} 
+            />
+            <TextField 
+                label="Link"
+                value={window.location.href} 
+            />
+        </div>
+    )
+}
+
+function UsersPopup({
+    participants = []
+}: {
+    participants: string[];
+}) {
+    const theme = useTheme();
+
+    return (
+        <div style={{ backgroundColor: theme.palette.background.default }} className="header__users-popup">
+            {
+                participants.map(e => (
+                    <div key={e} className="header__users-popup__user">
+                        <UserIcon />
+                        <Typography variant="body1">{e}</Typography>
+                    </div>
+                ))
+            }
+        </div>
+    )
+}
+
+
+function Header({
+    lang,
+    text,
+    hash,
+    setText,
+    setLang
+}: {
+    lang: string;
+    text: string;
+    hash: string | undefined;
+    setText: (text: string) => void;
+    setLang: (lang: string) => void;
+}) {
     const inviteBtnRef = useRef<HTMLButtonElement>(null);
     const usersBtnRef = useRef<HTMLButtonElement>(null);
 
-    const { hash } = useParams();
+    const navigate = useNavigate();
 
     const { isPending, error, data: getRoomResult } = useQuery({
         queryKey: ["room"],
@@ -30,17 +82,13 @@ export default function Code() {
         }
     });
 
-    const [text, setText] = useState("");
-    const [lang, setLang] = useState(defaultLang);
     const [langs, setLangs] = useState<{ [key: string]: string }>({ "javascript": " JavaScript" });
     const [isAdmin, setIsAdmin] = useState(false);
     const [invitePopupOpened, setInvitePopupOpened] = useState(false);
     const [usersPopupOpened, setUsersPopupOpened] = useState(false);
-    const [registered, setRegistered] = useState(false);
-    // const [opponentOnline, setOpponentOnline] = useState(false);
     const [participants, setParticipants] = useState<string[]>([]);
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleClick = () => {
         setInvitePopupOpened(prev => !prev);
     };
 
@@ -78,7 +126,7 @@ export default function Code() {
         const token = getCookie("token");
         if (!token) return;
         socket.emit("join-room", { hash, token });
-    }, [hash, registered]);
+    }, [hash]);
 
     useEffect(() => {
         const token = getCookie("token");
@@ -148,8 +196,76 @@ export default function Code() {
         }, 1000);
     }, []);
 
+    function langChange(event: SelectChangeEvent) {
+        const newLang = event.target.value;
+        setLang(newLang);
+        (async () => {
+            if (!hash) return;
+            await FetchUtils.setLang(hash, newLang);
+        })();
+    }
+    
+    return (
+        <header className="header">
+            <div className="header__panel">
+                <Logo />
+                <Select
+                    placeholder="Language"
+                    variant="standard"
+                    value={lang}
+                    onChange={langChange}
+                    sx={{ width: 150 }}
+                    disabled={!isAdmin}
+                >
+                    {
+                        Object.keys(langs).map(e => (
+                            <MenuItem key={e} value={e}>{langs[e]}</MenuItem>
+                        ))   
+                    }
+                </Select>
+                <div className="header__actions">
+                    <Button variant="outlined" ref={inviteBtnRef} type="button" onClick={handleClick}>
+                        <Typography>Invite</Typography>
+                    </Button>
+                    <BasePopup style={{ transition: "none" }} open={invitePopupOpened} anchor={inviteBtnRef.current}>
+                        <InvitePopup
+                            hash={hash}
+                        />
+                    </BasePopup>
+                    {lang === "javascript" &&
+                        <Button
+                            variant="outlined"
+                            type="button"
+                            // eslint-disable-next-line no-eval
+                            onClick={() => eval(text)}
+                        >
+                            <Typography>Run JS</Typography>
+                        </Button>
+                    }
+                </div>
+            </div>
+            <Button
+                ref={usersBtnRef}
+                onClick={() => setUsersPopupOpened(prev => !prev)}
+            >
+                Users online
+            </Button>
+            <BasePopup style={{ transition: "none" }} open={usersPopupOpened} anchor={usersBtnRef.current}>
+                <UsersPopup
+                    participants={participants}
+                />
+            </BasePopup>
+        </header>
+    )
+}
 
-    function handleEditorMount(editor: any, monaco: Monaco) {
+export default function Code() {
+    const [text, setText] = useState("");
+    const [lang, setLang] = useState(defaultLang);
+
+    const { hash } = useParams();
+
+    function handleEditorMount(_editor: unknown, monaco: Monaco) {
         if (monaco) {
             monaco?.editor.defineTheme("code-online", {
                 "base": "vs-dark",
@@ -161,9 +277,9 @@ export default function Code() {
                 //   },
                 ],
                 "colors": {
-                    "editor.background": "#0c001f",
+                    "editor.background": "#0c001f"
                 }
-              });
+            });
 
             monaco.editor.setTheme("code-online");
         }
@@ -175,99 +291,15 @@ export default function Code() {
         setText(value || "");
     }
     
-    function langChange(event: SelectChangeEvent) {
-        const newLang = event.target.value;
-        setLang(newLang);
-        (async () => {
-            if (!hash) return;
-            await FetchUtils.setLang(hash, newLang);
-        })();
-    }
-
-    function InvitePopup() {
-        return (
-            <div style={{ backgroundColor: theme.palette.background.default }} className="header__invite-popup">
-                <TextField 
-                    label="Code"
-                    value={hash} 
-                />
-                <TextField 
-                    label="Link"
-                    value={window.location.href} 
-                />
-            </div>
-        )
-    }
-
-    function UsersPopup() {
-        return (
-            <div style={{ backgroundColor: theme.palette.background.default }} className="header__users-popup">
-                {
-                    participants.map(e => (
-                        <div key={e} className="header__users-popup__user">
-                            <UserIcon />
-                            <Typography variant="body1">{e}</Typography>
-                        </div>
-                    ))
-                }
-            </div>
-        )
-    }
-
-    function Header() {
-        return (
-            <header className="header">
-                <div className="header__panel">
-                    <Logo />
-                    <Select
-                        placeholder="Language"
-                        variant="standard"
-                        value={lang}
-                        onChange={langChange}
-                        sx={{ width: 150 }}
-                        disabled={!isAdmin}
-                    >
-                        {
-                            Object.keys(langs).map(e => (
-                                <MenuItem key={e} value={e}>{langs[e]}</MenuItem>
-                            ))   
-                        }
-                    </Select>
-                    <div className="header__actions">
-                        <Button variant="outlined" ref={inviteBtnRef} type="button" onClick={handleClick}>
-                            <Typography>Invite</Typography>
-                        </Button>
-                        <BasePopup style={{ transition: "none" }} open={invitePopupOpened} anchor={inviteBtnRef.current}>
-                            <InvitePopup />
-                        </BasePopup>
-                        {lang === "javascript" &&
-                            <Button
-                                variant="outlined"
-                                type="button"
-                                // eslint-disable-next-line no-eval
-                                onClick={() => eval(text)}
-                            >
-                                <Typography>Run JS</Typography>
-                            </Button>
-                        }
-                    </div>
-                </div>
-                <Button
-                    ref={usersBtnRef}
-                    onClick={() => setUsersPopupOpened(prev => !prev)}
-                >
-                    Users online
-                </Button>
-                <BasePopup style={{ transition: "none" }} open={usersPopupOpened} anchor={usersBtnRef.current}>
-                    <UsersPopup />
-                </BasePopup>
-            </header>
-        )
-    }
-
     return (
         <div className="body__wrapper">
-            {Header()}
+            <Header 
+                lang={lang} 
+                text={text} 
+                hash={hash || ""} 
+                setText={setText} 
+                setLang={setLang} 
+            />
             <main className="main">
                 <Editor 
                     className="code__editor" 
